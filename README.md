@@ -1,4 +1,4 @@
-﻿# OpenChat — Product Requirements Document (PRD)
+# OpenChat — Product Requirements Document (PRD)
 
 > Real-time public chat rooms with message persistence, Firebase authentication, and cloud deployment.
 
@@ -203,3 +203,24 @@ By the end of this project, students will understand:
 - How to deploy a full-stack application
 - How to use Git and GitHub in a real project
 - How to present a portfolio-ready project during interviews
+
+---
+
+## 12. Implementation Progress
+
+### Milestone 1 — Foundation & Interactive Mockup UI (Completed)
+
+#### Requirements Addressed
+* **Project Structure Setup**: Created standard folders for `frontend/` (css, js, images, mockups) and `backend/` in accordance with the project layout architecture.
+* **Join Room Screen (Screen 1)**: Integrated display name capture, selection list of rooms, custom room naming field, validations, and redirect handling.
+* **Chat Room Screen (Screen 2)**: Developed split sidebar/main workspace pane matching the look-and-feel of the mockup. Added interactive room lists, dynamic active status indicators, and message cards.
+* **Git Versioning**: Initialized git workspace, created a dedicated tracking branch `milestone-1`, and pushed to GitHub.
+
+#### Technical Details Summary
+* **Design System & Typography**: Imported `Outfit` and `Inter` via Google Fonts. Used custom HSL CSS custom properties to drive a high-end glassmorphic dark theme.
+* **Global Utilities**: Created [common.js](file:///d:/codeCoach_WS/FSD/FSD4_WS/Capstone-projects/openchat/frontend/js/common.js) to manage `sessionStorage` helpers, standard time string formatting, and a programmatically injected custom CSS keyframe-based toast notification helper.
+* **Client-side Logic**: 
+  * Validates username limits (3-20 characters) and room name characters (3-30 characters, no leading/trailing spaces).
+  * Automatically switches user's active session room, re-renders history, updates headers/badges, and supports custom room creation on-the-fly.
+  * Auto-grows input textareas on input and supports `Enter` to send, alongside a mock bot responder for a dynamic user experience.
+* **Backend Skeleton**: Established initial package configurations, Express router base, and Socket.IO connection event headers in [server.js](file:///d:/codeCoach_WS/FSD/FSD4_WS/Capstone-projects/openchat/backend/server.js).
