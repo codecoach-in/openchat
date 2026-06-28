@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenChat - Room</title>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/chat.css">
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="images/logo.png" alt="OpenChat" class="sidebar-logo-img">
+        <span class="sidebar-logo-text">OpenChat</span>
+      </div>
+
+      <div class="sidebar-menu">
+        <div class="section-title">Rooms</div>
+        
+        <div class="rooms-nav" id="roomsNav">
+          <!-- Populated dynamically via JS -->
+          <div class="sidebar-room-item active" data-room="General">
+            <span class="room-hash">#</span>
+            <span class="room-title">General</span>
+            <span class="room-user-count">12 online</span>
+          </div>
+          <div class="sidebar-room-item" data-room="JavaScript">
+            <span class="room-hash">#</span>
+            <span class="room-title">JavaScript</span>
+            <span class="room-user-count">8 online</span>
+          </div>
+          <div class="sidebar-room-item" data-room="Movies">
+            <span class="room-hash">#</span>
+            <span class="room-title">Movies</span>
+            <span class="room-user-count">5 online</span>
+          </div>
+          <div class="sidebar-room-item" data-room="Sports">
+            <span class="room-hash">#</span>
+            <span class="room-title">Sports</span>
+            <span class="room-user-count">7 online</span>
+          </div>
+        </div>
+
+        <button class="create-room-btn" id="sidebarCreateRoomBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="plus-icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Create New Room</span>
+        </button>
+      </div>
+
+      <!-- User footer profile block -->
+      <div class="sidebar-footer">
+        <div class="user-profile-card">
+          <div class="user-avatar" id="currentUserAvatar">AK</div>
+          <div class="user-info">
+            <div class="user-name" id="currentUserName">Alex Kumar</div>
+            <div class="user-status">
+              <span class="status-dot"></span>
+              <span>Online</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="chat-main">
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="room-header-info">
+          <h2 class="current-room-name" id="currentRoomName"># General</h2>
+          <span class="current-room-status" id="currentRoomStatus">12 members online</span>
+        </div>
+        <div class="header-actions">
+          <button class="action-btn" title="View Members">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="badge" id="memberCountBadge">12</span>
+          </button>
+          <button class="action-btn" title="Notifications">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+          <button class="action-btn leave-btn" id="leaveRoomBtn" title="Leave Chat Room">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat Feed/Messages -->
+      <div class="chat-feed" id="chatFeed">
+        <!-- Message elements populated via JS -->
+      </div>
+
+      <!-- Chat Input Area -->
+      <footer class="chat-input-container">
+        <form id="chatForm" class="chat-input-form">
+          <button type="button" class="input-action-btn" title="Add Emoji">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </button>
+          
+          <div class="input-wrapper">
+            <textarea id="messageInput" class="message-textarea" placeholder="Type your message..." rows="1"></textarea>
+            <span class="textarea-hint">Press Enter to send</span>
+          </div>
+
+          <button type="button" class="input-action-btn" title="Attach File">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+
+          <button type="submit" class="send-message-btn" id="sendMessageBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="plane-icon"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Create Room Modal / UI Dialogue (UI only) -->
+  <div class="modal-backdrop" id="createRoomModal">
+    <div class="modal-card">
+      <h3 class="modal-title">Create a New Room</h3>
+      <input type="text" id="modalRoomInput" class="form-input modal-input" placeholder="Room name (e.g. music, gaming)" autocomplete="off">
+      <div class="modal-actions">
+        <button type="button" class="modal-btn cancel-btn" id="modalCancelBtn">Cancel</button>
+        <button type="button" class="modal-btn confirm-btn" id="modalConfirmBtn">Create Room</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>

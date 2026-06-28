@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenChat - Join Room</title>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/join-room.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-logo">
+      <img src="images/logo.png" alt="OpenChat Logo" class="logo-img">
+      <span class="logo-text">OpenChat</span>
+    </div>
+    <div class="header-actions">
+      <button class="guest-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="user-icon"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Guest Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Join Container -->
+  <div class="join-container">
+    <main class="join-card">
+      <div class="card-icon-container">
+        <div class="chat-bubble-gradient">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor" class="chat-bubble-svg"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+        </div>
+      </div>
+      
+      <h1 class="card-title">Join a Chat Room</h1>
+      <p class="card-subtitle">Enter your details and join the conversation</p>
+      
+      <form id="joinForm" class="join-form">
+        <!-- Display Name -->
+        <div class="form-group">
+          <label for="displayName" class="form-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="field-icon"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Display Name
+          </label>
+          <input type="text" id="displayName" placeholder="Enter your display name" class="form-input" autocomplete="off">
+          <span class="form-hint">3–20 characters</span>
+        </div>
+
+        <!-- Available Rooms -->
+        <div class="form-group">
+          <label class="form-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="field-icon"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+            Available Rooms
+          </label>
+          
+          <div class="rooms-list">
+            <label class="room-option">
+              <input type="radio" name="room" value="General" checked>
+              <span class="room-radio-custom"></span>
+              <span class="room-name">General</span>
+              <span class="room-badge">12 online</span>
+            </label>
+            
+            <label class="room-option">
+              <input type="radio" name="room" value="JavaScript">
+              <span class="room-radio-custom"></span>
+              <span class="room-name">JavaScript</span>
+              <span class="room-badge">8 online</span>
+            </label>
+            
+            <label class="room-option">
+              <input type="radio" name="room" value="Movies">
+              <span class="room-radio-custom"></span>
+              <span class="room-name">Movies</span>
+              <span class="room-badge">5 online</span>
+            </label>
+            
+            <label class="room-option">
+              <input type="radio" name="room" value="Sports">
+              <span class="room-radio-custom"></span>
+              <span class="room-name">Sports</span>
+              <span class="room-badge">7 online</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- OR Divider -->
+        <div class="or-divider">
+          <span class="or-text">OR</span>
+        </div>
+
+        <!-- Create Custom Room -->
+        <div class="form-group">
+          <label for="customRoom" class="form-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="field-icon"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+            Create New Room
+          </label>
+          <input type="text" id="customRoom" placeholder="Enter new room name (e.g. music, travel)" class="form-input" autocomplete="off">
+          <span class="form-hint">No spaces at start or end. 3–30 characters.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn">
+          <span>Join Room</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="submit-arrow"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="join-footer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>OpenChat is a public chat platform. Be respectful and follow community guidelines.</span>
+    </footer>
+  </div>
+
+  <!-- Background Decorative Shapes -->
+  <div class="bg-decoration">
+    <div class="blob shape-1"></div>
+    <div class="blob shape-2"></div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/join-room.js"></script>
+</body>
+</html>
