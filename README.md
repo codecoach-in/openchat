@@ -224,3 +224,19 @@ By the end of this project, students will understand:
   * Automatically switches user's active session room, re-renders history, updates headers/badges, and supports custom room creation on-the-fly.
   * Auto-grows input textareas on input and supports `Enter` to send, alongside a mock bot responder for a dynamic user experience.
 * **Backend Skeleton**: Established initial package configurations, Express router base, and Socket.IO connection event headers in [server.js](file:///d:/codeCoach_WS/FSD/FSD4_WS/Capstone-projects/openchat/backend/server.js).
+
+### Milestone 2 — Backend TypeScript Migration & DB Integration (Completed)
+
+#### Requirements Addressed
+* **TypeScript Re-architecture**: Migrated Javascript server configuration to TypeScript, introducing structured directories for `src/config/`, `src/controllers/`, `src/middleware/`, `src/models/`, `src/routes/`, `src/services/`, and `src/types/`.
+* **MongoDB Integration**: Structured schemas and indexes for rooms and messages to enable permanent chat histories.
+* **REST API Interfaces**: Exposed endpoints for fetching rooms, creating custom rooms, retrieving messages history, and saving user messages.
+* **Frontend Refactoring**: Refactored static javascript page routines to interact dynamically with backend APIs.
+
+#### Technical Details Summary
+* **Layered Separation of Concerns**:
+  * **Controllers**: Map raw Express request/response interfaces, handle status formatting, and delegate error parameters.
+  * **Services**: Handle Mongo model queries, sorting configurations, unique validation checks, and populate operations.
+  * **Middlewares**: Setup centralized custom errorHandler, request loggers, and 404 handlers.
+* **Database Interactivity**: Configured Mongoose connections to MongoDB, mapping document structures using standard TypeScript helper interfaces (`IRoomDoc`, `IMessageDoc`).
+* **Frontend REST API Service**: Created [api.js](file:///d:/codeCoach_WS/FSD/FSD4_WS/Capstone-projects/openchat/frontend/js/api.js) using native fetch APIs to handle data synchronization, rendering available databases list, and storing newly created messages permanently.

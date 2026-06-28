@@ -1,7 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // 1. Session check
   const sessionUser = window.OpenChat.session.get('openchat_user');
-  if (!sessionUser || !sessionUser.username || !sessionUser.room) {
+  if (!sessionUser || !sessionUser.username || !sessionUser.room || !sessionUser.roomId) {
     window.location.href = 'index.html';
     return;
   }
@@ -23,130 +23,134 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatForm = document.getElementById('chatForm');
   const messageInput = document.getElementById('messageInput');
 
-  // 3. Application State (Mock Data)
-  let activeRoom = sessionUser.room;
-  let rooms = {
-    'General': { online: 12, messages: [] },
-    'JavaScript': { online: 8, messages: [] },
-    'Movies': { online: 5, messages: [] },
-    'Sports': { online: 7, messages: [] }
+  // 3. State Variables
+  let activeRoomName = sessionUser.room;
+  let activeRoomId = sessionUser.roomId;
+  let rooms = []; // Fetched from backend
+  let activeMessages = []; // Message history
+
+  const userColors = ['green', 'blue', 'orange', 'pink', 'purple'];
+  
+  const getInitials = (name) => {
+    if (!name) return '??';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
-  // Seed custom room if user created one from join screen
-  if (!rooms[activeRoom]) {
-    rooms[activeRoom] = { online: 1, messages: [] };
-  }
-
-  // Sample seed messages
-  const userColors = ['green', 'blue', 'orange', 'pink', 'purple'];
-  const getInitials = (name) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-
-  // Initialize mock history
-  rooms['General'].messages = [
-    { type: 'system', text: 'Alice joined the room', time: '10:32 AM', class: 'joined' },
-    { type: 'system', text: 'Bob joined the room', time: '10:33 AM', class: 'joined-alt' },
-    { type: 'user', username: 'Alice', text: 'Hello everyone! 👋', time: '10:34 AM', avatarColor: 'green' },
-    { type: 'user', username: 'Bob', text: 'Hi Alice! Welcome to the room.', time: '10:35 AM', avatarColor: 'blue' },
-    { type: 'user', username: 'Charlie', text: 'Good morning all ☀️', time: '10:36 AM', avatarColor: 'orange' },
-    { type: 'user', username: 'Diana', text: 'Nice to see you all here!', time: '10:37 AM', avatarColor: 'pink' },
-    { type: 'system', text: 'Charlie joined the room', time: '10:36 AM', class: 'joined-alt' }
-  ];
-
-  rooms['JavaScript'].messages = [
-    { type: 'system', text: 'JS Bot joined the room', time: '09:00 AM', class: 'joined' },
-    { type: 'user', username: 'Sarah', text: 'Anyone know why my async function is returning undefined?', time: '09:15 AM', avatarColor: 'purple' },
-    { type: 'user', username: 'Devin', text: 'Make sure you are actually awaiting the promise call!', time: '09:16 AM', avatarColor: 'orange' }
-  ];
-
-  rooms['Movies'].messages = [
-    { type: 'user', username: 'Cinephile', text: 'What did everyone think of the new interstellar release?', time: '11:05 AM', avatarColor: 'blue' }
-  ];
-
-  rooms['Sports'].messages = [
-    { type: 'system', text: 'SportsRoom started', time: 'Yesterday', class: 'joined' }
-  ];
+  const getAvatarColor = (name) => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash % userColors.length);
+    return userColors[index];
+  };
 
   // Set Profile Footer info
   currentUserName.textContent = sessionUser.username;
   currentUserAvatar.textContent = getInitials(sessionUser.username);
 
-  // 4. Helper Render Functions
+  // 4. API Operations
+  async function refreshRooms() {
+    try {
+      rooms = await window.OpenChatAPI.getRooms();
+      renderRoomsList();
+    } catch (error) {
+      window.OpenChat.showToast('Error loading rooms.', 'error');
+    }
+  }
+
+  async function loadMessages() {
+    try {
+      chatFeed.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 20px; text-align: center;">Loading message history...</div>';
+      activeMessages = await window.OpenChatAPI.getMessages(activeRoomId);
+      renderChatFeed();
+    } catch (error) {
+      chatFeed.innerHTML = '<div style="color: var(--text-error); font-size: 0.9rem; padding: 20px; text-align: center;">Failed to load messages.</div>';
+    }
+  }
+
+  // 5. Render Functions
   function renderRoomsList() {
     roomsNav.innerHTML = '';
-    Object.keys(rooms).forEach(roomName => {
-      const room = rooms[roomName];
-      const isActive = roomName === activeRoom;
-      
+    rooms.forEach((room, idx) => {
+      const isActive = room._id === activeRoomId;
       const roomEl = document.createElement('div');
       roomEl.className = `sidebar-room-item ${isActive ? 'active' : ''}`;
-      roomEl.dataset.room = roomName;
+      roomEl.dataset.roomId = room._id;
+      
+      // Mock online numbers for display
+      const mockCounts = [12, 8, 5, 7, 3, 2];
+      const onlineCount = mockCounts[idx % mockCounts.length];
+
       roomEl.innerHTML = `
         <span class="room-hash">#</span>
-        <span class="room-title">${roomName}</span>
-        <span class="room-user-count">${room.online} online</span>
+        <span class="room-title">${room.roomName}</span>
+        <span class="room-user-count">${onlineCount} online</span>
       `;
       
-      roomEl.addEventListener('click', () => switchRoom(roomName));
+      roomEl.addEventListener('click', () => switchRoom(room._id, room.roomName));
       roomsNav.appendChild(roomEl);
     });
   }
 
   function renderChatFeed() {
     chatFeed.innerHTML = '';
-    const messages = rooms[activeRoom].messages;
+    
+    if (activeMessages.length === 0) {
+      chatFeed.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 20px; text-align: center;">No messages yet. Start the conversation!</div>';
+      return;
+    }
 
-    messages.forEach(msg => {
-      if (msg.type === 'system') {
-        const sysEl = document.createElement('div');
-        sysEl.className = `system-msg ${msg.class || 'joined'}`;
-        sysEl.innerHTML = `
-          <span>👋 ${msg.text}</span>
-          <span class="system-msg-time">${msg.time}</span>
-        `;
-        chatFeed.appendChild(sysEl);
-      } else {
-        const msgEl = document.createElement('div');
-        const isSelf = msg.username === sessionUser.username;
-        msgEl.className = `message-card ${isSelf ? 'self' : ''}`;
-        
-        const avatarColor = msg.avatarColor || 'blue';
-        const initials = getInitials(msg.username);
+    activeMessages.forEach(msg => {
+      const msgEl = document.createElement('div');
+      const isSelf = msg.username === sessionUser.username;
+      msgEl.className = `message-card ${isSelf ? 'self' : ''}`;
+      
+      const avatarColor = getAvatarColor(msg.username);
+      const initials = getInitials(msg.username);
+      const timeFormatted = window.OpenChat.formatTime(msg.createdAt);
 
-        msgEl.innerHTML = `
-          <div class="msg-avatar color-${avatarColor}">${initials}</div>
-          <div class="msg-content-wrapper">
-            <div class="msg-header">
-              <span class="msg-username">${msg.username}</span>
-              <span class="msg-time">${msg.time}</span>
-            </div>
-            <div class="msg-text">${msg.text}</div>
+      msgEl.innerHTML = `
+        <div class="msg-avatar color-${avatarColor}">${initials}</div>
+        <div class="msg-content-wrapper">
+          <div class="msg-header">
+            <span class="msg-username">${msg.username}</span>
+            <span class="msg-time">${timeFormatted}</span>
           </div>
-        `;
-        chatFeed.appendChild(msgEl);
-      }
+          <div class="msg-text">${msg.message}</div>
+        </div>
+      `;
+      chatFeed.appendChild(msgEl);
     });
 
     scrollToBottom();
   }
 
   function updateHeader() {
-    currentRoomName.textContent = `# ${activeRoom}`;
-    const onlineCount = rooms[activeRoom].online;
+    currentRoomName.textContent = `# ${activeRoomName}`;
+    // Simple static count display
+    const matched = rooms.find(r => r._id === activeRoomId);
+    const mockCounts = [12, 8, 5, 7, 3, 2];
+    const roomIdx = rooms.findIndex(r => r._id === activeRoomId);
+    const onlineCount = mockCounts[roomIdx >= 0 ? roomIdx % mockCounts.length : 1];
+    
     currentRoomStatus.textContent = `${onlineCount} members online`;
     memberCountBadge.textContent = onlineCount;
   }
 
-  function switchRoom(roomName) {
-    if (activeRoom === roomName) return;
-    activeRoom = roomName;
-    
+  async function switchRoom(roomId, roomName) {
+    if (activeRoomId === roomId) return;
+    activeRoomId = roomId;
+    activeRoomName = roomName;
+
     // Save to session
-    sessionUser.room = activeRoom;
+    sessionUser.roomId = activeRoomId;
+    sessionUser.room = activeRoomName;
     window.OpenChat.session.set('openchat_user', sessionUser);
 
     renderRoomsList();
     updateHeader();
-    renderChatFeed();
+    await loadMessages();
     
     window.OpenChat.showToast(`Switched to room: #${roomName}`, 'success');
   }
@@ -155,50 +159,25 @@ document.addEventListener('DOMContentLoaded', () => {
     chatFeed.scrollTop = chatFeed.scrollHeight;
   }
 
-  // 5. Actions / Events
-  
-  // Submit Message
-  chatForm.addEventListener('submit', (e) => {
+  // 6. Action Triggers & Form Submits
+  chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = messageInput.value.trim();
     if (!text) return;
 
-    const timeString = window.OpenChat.formatTime(new Date());
-
-    // Add user message
-    rooms[activeRoom].messages.push({
-      type: 'user',
-      username: sessionUser.username,
-      text: text,
-      time: timeString,
-      avatarColor: 'blue' // Current user color
-    });
-
-    renderChatFeed();
-    messageInput.value = '';
-    messageInput.style.height = 'auto'; // Reset text area height
-
-    // Simple simulated chatbot reply for premium feel
-    setTimeout(() => {
-      const replies = [
-        "That's interesting! Let's talk more.",
-        "I totally agree with that point.",
-        "Could you expand on that?",
-        "Interesting... this matches what I read yesterday.",
-        "Wow, nice! Thanks for sharing."
-      ];
-      const randomReply = replies[Math.floor(Math.random() * replies.length)];
-      const botTime = window.OpenChat.formatTime(new Date());
-
-      rooms[activeRoom].messages.push({
-        type: 'user',
-        username: 'ChatBot',
-        text: randomReply,
-        time: botTime,
-        avatarColor: 'purple'
-      });
+    try {
+      // Send to server
+      const savedMsg = await window.OpenChatAPI.sendMessage(activeRoomId, sessionUser.username, text);
+      
+      // Append returned message and render
+      activeMessages.push(savedMsg);
       renderChatFeed();
-    }, 1500);
+      
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+    } catch (error) {
+      window.OpenChat.showToast(error.message || 'Failed to send message.', 'error');
+    }
   });
 
   // Grow textarea automatically with typing
@@ -215,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Create Room modal triggers
+  // Create Room Modal Handlers
   sidebarCreateRoomBtn.addEventListener('click', () => {
     createRoomModal.classList.add('show');
     modalRoomInput.focus();
@@ -226,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalRoomInput.value = '';
   });
 
-  modalConfirmBtn.addEventListener('click', () => {
+  modalConfirmBtn.addEventListener('click', async () => {
     const newRoomName = modalRoomInput.value.trim();
     const error = window.OpenChat.validation.validateRoomName(newRoomName);
     
@@ -236,28 +215,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (rooms[newRoomName]) {
-      window.OpenChat.showToast('Room already exists.', 'error');
+    try {
+      const newRoom = await window.OpenChatAPI.createRoom(newRoomName);
+      createRoomModal.classList.remove('show');
+      modalRoomInput.value = '';
+      
+      // Refresh list, then switch to it
+      await refreshRooms();
+      await switchRoom(newRoom._id, newRoom.roomName);
+    } catch (error) {
+      window.OpenChat.showToast(error.message || 'Error creating room.', 'error');
       modalRoomInput.focus();
-      return;
     }
-
-    // Add room
-    rooms[newRoomName] = { online: 1, messages: [] };
-    
-    // Add system starter message
-    rooms[newRoomName].messages.push({
-      type: 'system',
-      text: `${sessionUser.username} created room #${newRoomName}`,
-      time: window.OpenChat.formatTime(new Date()),
-      class: 'joined'
-    });
-
-    createRoomModal.classList.remove('show');
-    modalRoomInput.value = '';
-    
-    // Switch to new room
-    switchRoom(newRoomName);
   });
 
   // Leave room button
@@ -269,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 800);
   });
 
-  // Initial render calls
-  renderRoomsList();
+  // Initial Load calls
+  await refreshRooms();
   updateHeader();
-  renderChatFeed();
+  await loadMessages();
 });
