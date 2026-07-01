@@ -4,17 +4,23 @@ import { RoomService } from '../services/room.service';
 export class RoomController {
   static async getRooms(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      console.log("RoomController in getRooms BE !");
       const rooms = await RoomService.getAllRooms();
+      console.log("RoomController after getRooms BE ", rooms);
       res.status(200).json({ success: true, count: rooms.length, data: rooms });
     } catch (error) {
+      console.log("error in getRooms BE ", error);
       next(error);
     }
   }
 
   static async getRoomById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      console.log("in getRoomById BE !");
       const { id } = req.params;
+      console.log("after getRoomById BE ", id);
       const room = await RoomService.getRoomById(id);
+      console.log("after getRoomById BE ", room);
       if (!room) {
         res.status(404);
         throw new Error('Room not found.');

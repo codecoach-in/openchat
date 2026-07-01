@@ -9,8 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadRooms() {
     try {
       roomsListContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px;">Loading rooms...</div>';
+      console.log("join-room.js: before call loadRooms")
       fetchedRooms = await window.OpenChatAPI.getRooms();
-      
+      console.log("join-room.js: after call loadRooms")
+      console.log("join-room.js: fetchedRooms ", fetchedRooms)
       if (fetchedRooms.length === 0) {
         roomsListContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 10px;">No rooms found. Create a new one below!</div>';
         return;
@@ -18,20 +20,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       roomsListContainer.innerHTML = '';
       fetchedRooms.forEach((room, idx) => {
+        console.log("join-room.js: forEach loop room", idx, room)
         const optionLabel = document.createElement('label');
         optionLabel.className = 'room-option';
-        
+
         // General online count mock display
         const mockOnline = [12, 8, 5, 7, 3, 2];
         const onlineCount = room.online || mockOnline[idx % mockOnline.length];
-        
+
         optionLabel.innerHTML = `
           <input type="radio" name="room" value="${room._id}" ${idx === 0 ? 'checked' : ''}>
           <span class="room-radio-custom"></span>
           <span class="room-name">${room.roomName}</span>
           <span class="room-badge">${onlineCount} online</span>
         `;
-        
+
         roomsListContainer.appendChild(optionLabel);
       });
 
@@ -45,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function attachRadioHandlers() {
     const roomRadios = document.querySelectorAll('input[name="room"]');
-    
+
     // Auto-select styling for checked
     roomRadios.forEach(radio => {
       const option = radio.closest('.room-option');
@@ -87,6 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Load rooms on start
+  console.log("join-room.js: about to call loadRooms")
   await loadRooms();
 
   // Form submission
@@ -95,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const username = displayNameInput.value.trim();
     const customRoom = customRoomInput.value.trim();
-    
+
     // Get selected room ID
     let selectedRoomId = '';
     const roomRadios = document.querySelectorAll('input[name="room"]');
@@ -153,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       room: finalRoomName,
       roomId: finalRoomId
     };
-    
+
     window.OpenChat.session.set('openchat_user', userSession);
     window.OpenChat.showToast(`Entering room "${finalRoomName}"...`, 'success');
 

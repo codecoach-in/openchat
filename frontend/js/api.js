@@ -5,9 +5,13 @@ const OpenChatAPI = {
   // Fetch list of rooms
   async getRooms() {
     try {
+      console.log("OpenChatAPI: getRooms - api.js ", `${API_BASE_URL}/rooms`)
       const response = await fetch(`${API_BASE_URL}/rooms`);
+      console.log("OpenChatAPI: getRooms - api.js after fetch")
       const result = await response.json();
+      console.log("OpenChatAPI: getRooms - api.js after json", result);
       if (!response.ok) throw new Error(result.message || 'Failed to fetch rooms.');
+      console.log("OpenChatAPI: getRooms - api.js before return")
       return result.data;
     } catch (error) {
       console.error('Error fetching rooms:', error);
